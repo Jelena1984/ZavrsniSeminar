@@ -3,6 +3,8 @@
 @inject HttpClient httpClient;
 @inject NavigationManager navigationManager;
 <h3>ProductList</h3>
+
+<button @onclick="AddProduct">Add Product</button>
 <ul>
     @foreach (var item in products)
     {
@@ -12,6 +14,7 @@
                 <br>
                 @item.ProductDescription
                 <button @onclick="()=>Edit(item.Id)">Edit</button>
+                <button @onclick="()=>Delete(item.Id)">Delete</button>
 
             </div>
             <div>
@@ -62,5 +65,14 @@
     public async void Edit(int id)
     {
         navigationManager.NavigateTo($"Admin/edit-product/{id}");
+    }
+    public async void Delete(int id)
+    {
+        navigationManager.NavigateTo($"Admin/delete-product/{id}");
+       
+    }
+    public async void AddProduct()
+    {
+        navigationManager.NavigateTo($"Admin/add-product");
     }
 }
