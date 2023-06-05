@@ -1,0 +1,52 @@
+﻿@page "/Admin/delete-category/{id:int}"
+@using Moj.Web.Shop.Models;
+@inject HttpClient httpClient;
+@inject NavigationManager navManager;
+@inject IJSRuntime jsRun;
+<h3>DeleteCategory</h3>
+
+<div>
+    @category.CategoryName
+    <br />
+    @category.CategoryDescription
+    <br />
+    @category.IsHidden
+
+    <button type="button" class="btn-danger" @onclick="()=>Delete(category.Id)">
+        Obriši
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Category category = new Category();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await httpClient.GetAsync($"https://expertshopapi.azurewebsites.net/api/Categories/{Id}");
+        if (result.IsSuccessStatusCode)
+        {
+            category = await result.Content.ReadFromJsonAsync<Category>();
+        }
+
+    }
+
+    private async Task Delete(int id)
+    {
+        //await jsRun.InvokeVoidAsync("alert","Pazite! Pokušavate obrisati kategoriju!");
+
+        var result = new HttpResponseMessage();
+
+        var confirm = await jsRun.InvokeAsync<bool>("confirm", "Jeste li sigurni da želite obrisati stavku?"); /*invokanje JS u C# , odlazi u IF*/
+        if (confirm == true)  /*ako je odgovor-DA izvsava kod*/
+        {
+
+            result = await httpClient.DeleteAsync($"https://expertshopapi.azurewebsites.net/api/Categories/{Id}");
+        }
+        if (result.IsSuccessStatusCode)
+        {
+            navManager.NavigateTo("Admin/category-list");
+        }
+    }
+}

@@ -1,0 +1,41 @@
+﻿@page "/product-details/{id:int}/{categoryName}"
+@inject HttpClient httpClient;
+@inject ShoppingCartInMemory shoppingCartInMemory
+@inject NavigationManager navManager;
+@using Models;
+<h3>Details</h3>
+<p>
+    @productDetails.ProductName
+</p>
+<p>@productDetails.ProductDescription</p>
+<p>@productDetails.ProductPrice</p>
+<p>@productDetails.Discount</p>
+
+<button class="btn-info" @onclick="()=>shoppingCartInMemory.AddToShoppingCart(productDetails.Id)">Dodaj u košaricu</button>
+
+
+<button type="button" @onclick="Natrag">Natrag na listu</button>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string CategoryName { get; set; }
+    private Product productDetails = new Product();
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await httpClient.GetAsync($"{Constants.BaseUrl}/Products/{Id}");
+        if (result.IsSuccessStatusCode)
+        {
+            productDetails = await result.Content.ReadFromJsonAsync<Product>();
+        }
+
+    }
+
+    public async Task Natrag()
+    {
+        navManager.NavigateTo($"/category/{productDetails.CategoryId}/{CategoryName}");
+
+    }
+
+
+}
